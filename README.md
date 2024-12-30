@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -48,3 +49,7 @@ export default tseslint.config({
   },
 })
 ```
+=======
+# spotify-playlist-creator
+Using React, Vite, Typescript, and Tailwind to connect with Spotify's API to create a playlist and add to your account.
+>>>>>>> e362763b89eddb9bff70474197b3a304ee6e4e84
