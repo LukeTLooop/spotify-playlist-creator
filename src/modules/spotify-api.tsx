@@ -38,6 +38,10 @@ export async function redirectToAuthCodeFlow(clientId: string) {
     params.append("scope", "user-read-private user-read-email");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
+    params.append(
+        "scope",
+        "user-read-private user-read-email playlist-modify-private playlist-modify-public"
+      );
 
     document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
 }
@@ -108,16 +112,66 @@ export async function searchTracks(accessToken: string, query: string) {
     return data.tracks?.items ?? [];
 }
 
-// async function fetchProfile(token: string): Promise<UserProfile> {
-//     const result = await fetch("https://api.spotify.com/v1/me", {
-//         method: "GET",
-//         headers: {
-//             Authorization: `Bearer ${token}`
-//         }
-//     });
+export async function createPlaylist(accessToken: string, name: string): Promise<Playlist> {
+    const userData = await fetchProfile(accessToken);
 
-//     return await result.json();
-// }
+    const url = `https://api.spotify.com/v1/users/${userData.id}/playlists`;
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name,
+            description: "New Playlist created via API",
+            public: false,
+        })
+    });
+
+    const playlistData = await response.json();
+    return playlistData;
+}
+
+export async function addTracksToPlaylist(accessToken: string, playlistId: string, tracks: Track[]) {
+    try {
+        const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+
+        const trackUris = tracks.map((track) => `spotify:track:${track.id}`);
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                uris: trackUris
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to add tracks to playlist");
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error(`Error adding tracks to playlist: ${error}`);
+    }
+}
+
+async function fetchProfile(token: string): Promise<UserProfile> {
+    const result = await fetch("https://api.spotify.com/v1/me", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+    return await result.json();
+}
 
 // function populateUI(profile: UserProfile) {
 //     document.getElementById("displayName")!.innerText = profile.display_name;

@@ -4,12 +4,14 @@ import Playlist from "./components/Playlist"
 import SearchBar from "./components/SearchBar"
 import SearchResults from "./components/SearchResults"
 
-import { getToken, searchTracks } from "./modules/spotify-api";
+import { getToken, searchTracks, createPlaylist, addTracksToPlaylist } from "./modules/spotify-api";
 
 function App() {
   const [accessToken, setAccessToken] = useState<string>("");
+  const [search, setSearch] = useState("");
   const [queriedTracks, setQueriedTracks] = useState<Track[]>([]);
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]);
+  const [playlistName, setPlaylistName] = useState<string>("");
 
   // get token
   useEffect(() => {
@@ -25,6 +27,7 @@ function App() {
   async function handleSearch(query: string) {
     if (!accessToken) return;
 
+    setSearch(query);
     const results = await searchTracks(accessToken, query);
     setQueriedTracks(results);
   }
@@ -37,6 +40,33 @@ function App() {
 
   function handleRemoveTrack(track: Track) {
     setPlaylistTracks((prev) => prev.filter((t) => t.id !== track.id));
+  }
+
+  function handlePlaylistName({ target }: React.ChangeEvent<HTMLInputElement>) {
+      setPlaylistName(target.value);
+  }
+
+  async function handleCreatePlaylist(name: string) {
+    if (name.trim().length === 0) {
+      // Don't continue if the name is empty
+      return;
+    }
+
+    if (playlistTracks.length === 0) {
+      // Don't continue if there aren't any tracks in the playlist
+      return;
+    }
+
+    // Create the playlist
+    await createPlaylist(accessToken, name)
+      .then((playlist) => addTracksToPlaylist(accessToken, playlist.id, playlistTracks));
+
+    // Clear search query and playlist name
+    setSearch("");
+    setQueriedTracks([]);
+
+    setPlaylistName("");
+    setPlaylistTracks([]);
   }
 
   return (
@@ -58,7 +88,7 @@ function App() {
       </header>
 
       <div className="flex flex-col flex-grow w-3/4 h-[35%] mx-auto">
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearch={handleSearch} search={search} />
 
         <div className="flex flex-col h-[35%] md:flex-row flex-1 gap-6 mt-12">
           <section
@@ -98,6 +128,9 @@ function App() {
               <Playlist
                 playlistTracks={playlistTracks}
                 onRemoveTrack={handleRemoveTrack}
+                onCreatePlaylist={handleCreatePlaylist}
+                playlistName={playlistName}
+                setPlaylistName={handlePlaylistName}
               />
             </div>
           </section>

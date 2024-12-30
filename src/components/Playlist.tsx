@@ -1,13 +1,9 @@
 
-import React, { useState } from "react";
+import React from "react";
 import Tracklist from "./Tracklist";
 
-function Playlist({ playlistTracks, onRemoveTrack }: PlaylistProps) {
-    const [playlistName, setPlaylistName] = useState("");
-
-    function handlePlaylistName({ target }: React.ChangeEvent<HTMLInputElement>) {
-        setPlaylistName(target.value);
-    }
+function Playlist({ playlistTracks, playlistName, onRemoveTrack, onCreatePlaylist, setPlaylistName }: PlaylistProps) {
+    //const [playlistName, setPlaylistName] = useState("");
 
     function handleToggle(track: Track) {
         onRemoveTrack(track);
@@ -28,7 +24,7 @@ function Playlist({ playlistTracks, onRemoveTrack }: PlaylistProps) {
                     type="text"
                     placeholder="Playlist Name"
                     value={playlistName}
-                    onChange={handlePlaylistName}
+                    onChange={setPlaylistName}
                     className="
                         p-2 rounded
                         bg-gray-700
@@ -36,7 +32,7 @@ function Playlist({ playlistTracks, onRemoveTrack }: PlaylistProps) {
                         placeholder-gray-400
                     "
                 />
-                <button className="bg-green-600 text-white py-2 px-4 rounded">
+                <button className="bg-green-600 text-white py-2 px-4 rounded" onClick={() => onCreatePlaylist(playlistName)}>
                     Save to Spotify
                 </button>
             </div>

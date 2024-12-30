@@ -1,11 +1,8 @@
 
-import React, { useState } from "react";
+import React from "react";
 
-function SearchBar({ onSearch }: SearchBarProps) {
-    const [search, setSearch] = useState("");
-
+function SearchBar({ onSearch, search }: SearchBarProps) {
     const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(target.value);
         onSearch(target.value);
     };
 

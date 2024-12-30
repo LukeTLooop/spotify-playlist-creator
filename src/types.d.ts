@@ -16,6 +16,36 @@ interface UserProfile {
     uri: string;
 }
 
+interface Playlist {
+    id: string;
+    name: string;
+    description: string | null;
+    public: boolean;
+    uri: string;
+    href: string;
+    external_urls: {
+        spotify: string;
+    };
+    images: {
+        url: string;
+        height: number | null;
+        width: number | null;
+    }[];
+    owner: {
+        id: string;
+        display_name: string | null;
+        href: string;
+        uri: string;
+        external_urls: {
+            spotify: string;
+        };
+    };
+    tracks: {
+        href: string;
+        total: number;
+    };
+}
+
 interface Image {
     url: string;
     height: number;
@@ -49,7 +79,10 @@ interface TracklistProps {
 
 interface PlaylistProps {
     playlistTracks: Track[];
+    playlistName: string;
     onRemoveTrack: (track: Track) => void;
+    onCreatePlaylist: (name: string) => void;
+    setPlaylistName: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface SearchResultsProps {
@@ -60,5 +93,6 @@ interface SearchResultsProps {
 }
 
 interface SearchBarProps {
+    search: string;
     onSearch: (query: string) => void;
 }
